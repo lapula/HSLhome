@@ -1,0 +1,126 @@
+* {
+    font-family: Verdana, Lucida Sans, Arial, Helvetica, sans-serif;
+    
+}
+
+@font-face{ 
+	font-family: 'HSLWebFont';
+	src: url('WebFont.eot');
+	src: url('WebFont.eot?#iefix') format('embedded-opentype'),
+	     url('WebFont.woff') format('woff'),
+	     url('WebFont.ttf') format('truetype'),
+	     url('WebFont.svg#webfont') format('svg');
+}
+
+body {
+    margin: 0px auto;
+}
+
+.ui-content {
+	background-color:white;
+	margin-top: 60px;
+}
+
+.ui-header {
+	z-index: 10;
+	position: absolute;
+}
+
+.ui-listview li {
+	padding: 1rem 0.2rem 1rem 0.2rem;
+	line-height: 2.5rem;
+    font-size: 2.5rem;
+}
+
+.ui-listview .ui-li-sub-text {
+	font-size: 1.5rem;
+	color: #666666;
+}
+    
+
+.ui-listview li>* {
+	color: #333333;
+}
+
+#options {
+	text-align: center;
+	padding-top: 2em;
+	padding-bottom: 2em;
+	color: #333333;
+}
+
+#options div a {
+	color: #333333;
+}
+
+#refresh_time {
+	color: #333333;
+	text-align: center;
+}
+
+#settingsField {
+	width: 100%;
+}
+
+.realtime {
+	color: #3f8600 !important;
+}
+
+.hidden {
+	display: none;
+}
+
+.hsl-font {
+	font-family: 'HSLWebFont', Arial, sans-serif;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+.hsl-tram {
+	color:#00985F;
+}
+
+.hsl-bus {
+	color:#007AC9;
+}
+
+.hsl-train {
+	color:#8C4799;
+}
+
+.hsl-metro {
+	color:#FF6319;
+}
+
+.hsl-ferry {
+	color: #00B9E4;
+}
+
+.ui-listview.expand-list li.li-has-2line .ui-marquee {
+   -webkit-transform: translate3d(0, 16px, 0);
+   -webkit-transition: all ease .5s;
+}
+.ui-listview.expand-list li.li-has-2line.ui-snap-listview-selected .ui-marquee {
+   -webkit-transform: translate3d(0, 0, 0);
+   -webkit-transition: all ease 1s;
+}
+
+.ui-listview.expand-list li.li-has-2line .ui-li-sub-text {
+   -webkit-transform: translate3d(0, -20px, 0);
+   opacity: 0;
+   -webkit-transition: all ease .5s;
+}
+.ui-listview.expand-list li.li-has-2line.ui-snap-listview-selected .ui-li-sub-text {
+   -webkit-transform: translate3d(0, 0, 0);
+   opacity: 1;
+   -webkit-transition: all ease 1s;
+}
+
+.ui-title {
+	text-align: center;
+}
+
+.ui-content {
+	padding-left: 1em;
+	padding-right: 1em;
+}
