@@ -189,7 +189,7 @@ window.onload = function () {
 		document.getElementById("snapList").insertBefore(clone, liItem);
 	}
 	getStopDataWithoutLocation(true);
-	HSLQuery.queryByCoordinates(60.16656497, 24.96674739, 500).then(function(response){
+	HSLQuery.queryByCoordinates(60.166298, 24.967361, 500).then(function(response){
 		console.log(response);
 	});
 	getStopData();

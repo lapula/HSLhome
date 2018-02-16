@@ -1,10 +1,10 @@
 
 export function queryStopData(stops) {
 
-	var url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
-	var query = "{";
+	let url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
+	let query = "{";
 
-	for (var i = 0; i < stops.length; i++) {
+	for (let i = 0; i < stops.length; i++) {
 		query += "q" + stops[i] + ": stops(name: \"" + stops[i] + "\") {" +
 	    "name " +
 	    "code " +
@@ -44,8 +44,8 @@ export function queryStopData(stops) {
 }
 
 export function queryStopsByCoordinates(lat, lon, rad) {
-	var url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
-	var query = "{ " +
+	let url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
+	let query = "{ " +
 			  "stopsByRadius(lat:" + lat + " lon:" + lon + " radius:" + rad + ") {" +
 				    "edges {" +
 				      "node {" +
@@ -71,8 +71,8 @@ export function queryStopsByCoordinates(lat, lon, rad) {
 }
 
 export function queryByCoordinates(lat, lon, rad) {
-	var url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
-	var query = `
+	let url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
+	let query = `
 	{
   stopsByRadius(lat: ${lat}, lon: ${lon}, radius: ${rad}) {
     edges {
@@ -125,11 +125,9 @@ export function queryByCoordinates(lat, lon, rad) {
 
 function formatStopByOnlyLocationJsonData(responseJSON) {
 	const stops = responseJSON.data.stopsByRadius.edges;
-	let departures = [];
+	let formattedData = [];
 	stops.forEach((location) => {
-		let resultDepartures = [];
-
-		let trips = stop.node.stop.stoptimesWithoutPatterns.map((route) => {
+		let trips = location.node.stop.stoptimesWithoutPatterns.map((route) => {
 			return {
 				stopName: location.node.stop.name,
 				stopCode: location.node.stop.code,
@@ -139,25 +137,30 @@ function formatStopByOnlyLocationJsonData(responseJSON) {
 				headsign: route.headsign,
 				realtime: route.realtime,
 				type: route.trip.pattern.route.type,
-				id: route.trip.pattern.route.id + "/" + route.trip.pattern.directionId,
+				id: route.trip.pattern.route.id + "/" + route.trip.directionId,
 			};
 		})
-		console.log(trips)
-		departures.push(...trips)
-
+		formattedData.push(...trips)
 	});
-	return departures;
+
+	formattedData = formattedData.filter((obj, pos, arr) => {
+		const objIndex = arr.map(mapObj => mapObj.id).indexOf(obj.id);
+		return (objIndex === pos) || (objIndex === pos - 1);
+	});
+
+	return formattedData;
 }
 
 function formatStopJsonData(responseJSON, userStops) {
-	var formattedData = [];
-	var stopsList = responseJSON.data;
+	let formattedData = [];
+	let stopsList = responseJSON.data;
+	console.log("1")
+	console.log(stopsList)
+	for(let i = 0; i < userStops.length; i++) {
+		let stop = stopsList["q" + userStops[i]][0];
+		let stopDeparturesList = stop.stoptimesWithoutPatterns;
 
-	for(var i = 0; i < userStops.length; i++) {
-		var stop = stopsList["q" + userStops[i]][0];
-		var stopDeparturesList = stop.stoptimesWithoutPatterns;
-
-		for(var j = 0; j < stopDeparturesList.length; j++) {
+		for(let j = 0; j < stopDeparturesList.length; j++) {
 			formattedData.push({
 				stopName: stop.name,
 				stopCode: stop.code,
@@ -170,17 +173,17 @@ function formatStopJsonData(responseJSON, userStops) {
 		}
 	}
 
-	formattedData.sort(function(a, b) {
+	/*formattedData.sort(function(a, b) {
 	    return a.realTimeArrival - b.realTimeArrival;
-	});
+	});*/
 	return formattedData;
 }
 
 function formatStopByCoordinatesJsonData(responseJSON) {
-	var formattedData = [];
-	var stopsList = responseJSON.data.stopsByRadius.edges;
+	let formattedData = [];
+	let stopsList = responseJSON.data.stopsByRadius.edges;
 
-	for(var i = 0; i < stopsList.length; i++) {
+	for(let i = 0; i < stopsList.length; i++) {
 		formattedData[i] = stopsList[i].node.stop.code;
 	}
 
