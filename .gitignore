@@ -1,1 +1,6 @@
 js/dev/node_modules
+.settings
+.sign
+.project
+.tproject
+*.wgt
