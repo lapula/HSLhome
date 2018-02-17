@@ -72,12 +72,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HSLQuery_js__ = __webpack_require__(1);
 
 
-
 function getStopData() {
 		document.getElementById("refresh_time").style.backgroundColor = "#FED100";
 		if (tizen.preference.getValue('gps')) {
 			getLocationStopData();
 		} else {
+			console.log(2)
 			getStopDataWithoutLocation(false);
 		}
 }
@@ -262,7 +262,7 @@ window.onload = function () {
 	}
 	getStopDataWithoutLocation(true);
 	__WEBPACK_IMPORTED_MODULE_0__HSLQuery_js__["a" /* queryByCoordinates */](60.166298, 24.967361, 500).then(function(response){
-		console.log(response);
+		//console.log(response);
 	});
 	getStopData();
 	initRefreshTimeHandler(20);
@@ -324,127 +324,115 @@ window.onload = function () {
 /* harmony export (immutable) */ __webpack_exports__["a"] = queryByCoordinates;
 
 function queryStopData(stops) {
-
-	let url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
-	let query = "{";
-
-	for (let i = 0; i < stops.length; i++) {
-		query += "q" + stops[i] + ": stops(name: \"" + stops[i] + "\") {" +
-	    "name " +
-	    "code " +
-	      "stoptimesWithoutPatterns {" +
-	      "scheduledArrival " +
-	      "realtimeArrival " +
-	      "arrivalDelay " +
-	      "scheduledDeparture " +
-	      "realtime " +
-	      "realtimeState " +
-	      "serviceDay " +
-	      "headsign " +
-	      "trip {" +
-	          "pattern {" +
-	            "route {" +
-	              "shortName " +
-	              "type" +
-	            "}" +
-	          "}" +
-	        "}" +
-	      "} " +
-	  "} ";
-	}
-	query += "}";
-
-	return fetch(url, {
-		  method: 'POST',
-		  headers: {'Content-Type': 'application/graphql'},
-		  body: query
-	})
-	.then(function(response) {
-		return response.json();
-	})
-	.then(function(response) {
+	let queryLoop = stops.map((name) => {
+		return `q${name}: stops(name: "${name}") {
+	    name
+	    code
+	      stoptimesWithoutPatterns {
+	      scheduledArrival
+	      realtimeArrival
+	      arrivalDelay
+	      scheduledDeparture
+	      realtime
+	      realtimeState
+	      serviceDay
+	      headsign
+	      trip {
+	          pattern {
+	            route {
+	              shortName
+	              type
+	            }
+	          }
+	        }
+	      }
+	  }`;
+	});
+	const query =
+	`
+		{
+			${queryLoop.join(' ')}
+		}
+	`
+	return executeHslQuery(query).then((response) => {
 		return formatStopJsonData(response, stops);
 	});
 }
 
 function queryStopsByCoordinates(lat, lon, rad) {
-	let url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
-	let query = "{ " +
-			  "stopsByRadius(lat:" + lat + " lon:" + lon + " radius:" + rad + ") {" +
-				    "edges {" +
-				      "node {" +
-				        "stop {" +
-				          "code" +
-				        "}" +
-				      "}" +
-				    "}" +
-				  "}" +
-				"}";
+	const query =
+	`
+		{
+			stopsByRadius(lat: ${lat}, lon: ${lon}, radius: ${rad}) {
+				edges {
+					node {
+						stop {
+							code
+						}
+					}
+				}
+			}
+		}
+	`;
 
-	return fetch(url, {
-		  method: 'POST',
-		  headers: {'Content-Type': 'application/graphql'},
-		  body: query
-	})
-	.then(function(response) {
-		return response.json();
-	})
-	.then(function(response) {
+	return executeHslQuery(query).then((response) => {
 		return formatStopByCoordinatesJsonData(response);
 	});
 }
 
 function queryByCoordinates(lat, lon, rad) {
-	let url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
-	let query = `
-	{
-  stopsByRadius(lat: ${lat}, lon: ${lon}, radius: ${rad}) {
-    edges {
-      node {
-        distance
-        stop {
-          name
-          code
-          stoptimesWithoutPatterns {
-            scheduledArrival
-            realtimeArrival
-            arrivalDelay
-            scheduledDeparture
-            realtimeDeparture
-            departureDelay
-            realtime
-            realtimeState
-            serviceDay
-            headsign
-            trip {
-              directionId
-              pattern {
-                route {
-                  id
-                  shortName
-                  type
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
+	const query =
 	`
+		{
+		  stopsByRadius(lat: ${lat}, lon: ${lon}, radius: ${rad}) {
+		    edges {
+		      node {
+		        distance
+		        stop {
+		          name
+		          code
+		          stoptimesWithoutPatterns {
+		            scheduledArrival
+		            realtimeArrival
+		            arrivalDelay
+		            scheduledDeparture
+		            realtimeDeparture
+		            departureDelay
+		            realtime
+		            realtimeState
+		            serviceDay
+		            headsign
+		            trip {
+		              directionId
+		              pattern {
+		                route {
+		                  id
+		                  shortName
+		                  type
+		                }
+		              }
+		            }
+		          }
+		        }
+		      }
+		    }
+		  }
+		}
+	`;
 
+	return executeHslQuery(query).then((response) => {
+		return formatStopByOnlyLocationJsonData(response);
+	});
+}
+
+function executeHslQuery(query) {
+	const url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
 	return fetch(url, {
 		  method: 'POST',
 		  headers: {'Content-Type': 'application/graphql'},
 		  body: query
 	})
-	.then(function(response) {
-		return response.json();
-	})
-	.then(function(response) {
-		return formatStopByOnlyLocationJsonData(response);
-	});
+	.then((response) => {return response.json();})
 }
 
 function formatStopByOnlyLocationJsonData(responseJSON) {
@@ -477,39 +465,33 @@ function formatStopByOnlyLocationJsonData(responseJSON) {
 
 function formatStopJsonData(responseJSON, userStops) {
 	let formattedData = [];
-	let stopsList = responseJSON.data;
-	console.log("1")
-	console.log(stopsList)
-	for(let i = 0; i < userStops.length; i++) {
-		let stop = stopsList["q" + userStops[i]][0];
-		let stopDeparturesList = stop.stoptimesWithoutPatterns;
+	const stops = Object.keys(responseJSON.data).map(key => responseJSON.data[key]);;
 
-		for(let j = 0; j < stopDeparturesList.length; j++) {
-			formattedData.push({
-				stopName: stop.name,
-				stopCode: stop.code,
-				realTimeArrival: stopDeparturesList[j].realtimeArrival,
-				shortName: stopDeparturesList[j].trip.pattern.route.shortName,
-				headsign: stopDeparturesList[j].headsign,
-				realtime: stopDeparturesList[j].realtime,
-				type: stopDeparturesList[j].trip.pattern.route.type
-			});
-		}
-	}
+	stops.forEach((location) => {
+		const stopDeparturesList = location[0].stoptimesWithoutPatterns;
+		let trips = stopDeparturesList.map((route) => {
+			return {
+				stopName: location[0].name,
+				stopCode: location[0].code,
+				realTimeArrival: route.realtimeArrival,
+				shortName: route.trip.pattern.route.shortName,
+				headsign: route.headsign,
+				realtime: route.realtime,
+				type: route.trip.pattern.route.type
+			};
+		});
+		formattedData.push(...trips);
+	});
 
-	/*formattedData.sort(function(a, b) {
-	    return a.realTimeArrival - b.realTimeArrival;
-	});*/
 	return formattedData;
 }
 
 function formatStopByCoordinatesJsonData(responseJSON) {
-	let formattedData = [];
-	let stopsList = responseJSON.data.stopsByRadius.edges;
+	const stopsList = responseJSON.data.stopsByRadius.edges;
 
-	for(let i = 0; i < stopsList.length; i++) {
-		formattedData[i] = stopsList[i].node.stop.code;
-	}
+	let formattedData = stopsList.map((location) => {
+		return location.node.stop.code;
+	});
 
 	return formattedData;
 }

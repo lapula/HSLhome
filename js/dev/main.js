@@ -1,4 +1,3 @@
-
 import * as HSLQuery from './HSLQuery.js';
 
 function getStopData() {
@@ -6,6 +5,7 @@ function getStopData() {
 		if (tizen.preference.getValue('gps')) {
 			getLocationStopData();
 		} else {
+			console.log(2)
 			getStopDataWithoutLocation(false);
 		}
 }
@@ -190,7 +190,7 @@ window.onload = function () {
 	}
 	getStopDataWithoutLocation(true);
 	HSLQuery.queryByCoordinates(60.166298, 24.967361, 500).then(function(response){
-		console.log(response);
+		//console.log(response);
 	});
 	getStopData();
 	initRefreshTimeHandler(20);
