@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../../lib/tau/wearable/js/tau.js';
 
-class App extends React.Component {
+class SnapList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -14,10 +14,9 @@ class App extends React.Component {
   componentDidMount() {
 
 
-    if (!tizen.preference.exists('stops')) {
-  		tizen.preference.setValue('stops', "0412,0401,2047,3028,3036,2041,2024,2045,2043,2046");
-  	}
-    const page = this.refs.main;
+
+    const page = document.getElementById('main');
+    console.log(this.props.pageRef)
     const list = this.refs.snapList;
     let listHelper;
   	page.addEventListener('pageshow', function() {
@@ -30,10 +29,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="ui-page ui-page-active" ref="main">
-       <header className="ui-header">
-          <h2 className="ui-title" id="refresh_time"></h2>
-       </header>
+
        <div className="ui-content">
           <ul className="ui-listview ui-snap-listview expand-list" ref="snapList">
              <li className="li-has-3line">
@@ -56,8 +52,8 @@ class App extends React.Component {
              </li>
           </ul>
        </div>
-    </div>
+
     );
   }
 }
-export default App;
+export default SnapList;

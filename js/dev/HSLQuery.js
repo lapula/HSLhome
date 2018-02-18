@@ -29,9 +29,28 @@ export function queryStopData(stops) {
 		{
 			${queryLoop.join(' ')}
 		}
-	`
+	`;
 	return executeHslQuery(query).then((response) => {
 		return formatStopJsonData(response, stops);
+	});
+}
+
+export function queryStopToNameData(stops) {
+	let queryLoop = stops.map((name) => {
+		return `q${name}: stops(name: "${name}") {
+	    name
+	    code
+	  }`;
+	});
+	const query =
+	`
+		{
+			${queryLoop.join(' ')}
+		}
+	`;
+
+	return executeHslQuery(query).then((response) => {
+		return formatStopToNameJsonData(response, stops);
 	});
 }
 
@@ -157,6 +176,20 @@ function formatStopJsonData(responseJSON, userStops) {
 			};
 		});
 		formattedData.push(...trips);
+	});
+
+	return formattedData;
+}
+
+function formatStopToNameJsonData(responseJSON, userStops) {
+	let formattedData = [];
+	const stops = Object.keys(responseJSON.data).map(key => responseJSON.data[key]);
+	stops.forEach((location) => {
+			let trip = {
+				stopName: location[0].name,
+				stopCode: location[0].code,
+			};
+		formattedData.push(trip);
 	});
 
 	return formattedData;
